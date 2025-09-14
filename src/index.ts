@@ -121,7 +121,7 @@ export default function createServer({
 		version: "1.0.0",
 	})
 
-	const redditClient = new RedditAdsAPIClient(config.REDDABLE_API_KEY, "http://localhost:3000")
+	const redditClient = new RedditAdsAPIClient(config.REDDABLE_API_KEY, "http://reddable.vercel.app")
 
 	server.registerTool(
 		"getAdAccounts",
