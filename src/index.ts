@@ -82,8 +82,10 @@ class RedditAdsAPIClient {
 	}
 
 	async createPost(data: any) {
+		console.log("Creating posttt", data)
 		const requestData = {
 			data: {
+				profile_id: data.profileId,
 				allow_comments: data.allowComments,
 				content: data.content,
 				headline: data.headline,
@@ -92,6 +94,7 @@ class RedditAdsAPIClient {
 			}
 		}
 		const response = await this.axiosInstance.post('/api/reddit/ads/create-post', requestData)
+		console.log("Post created", response.data)
 		return response.data
 	}
 
@@ -130,7 +133,7 @@ export default function createServer({
 		version: "1.0.0",
 	})
 
-	const redditClient = new RedditAdsAPIClient(config.REDDABLE_API_KEY, "http://reddable.vercel.app")
+	const redditClient = new RedditAdsAPIClient(config.REDDABLE_API_KEY, "http://localhost:3000")
 
 	server.registerTool(
 		"getAdAccounts",
@@ -552,7 +555,7 @@ export default function createServer({
 				allowComments: z.boolean().describe("Enable comments on the post"),
 				thumbnailUrl: z.string().url().describe("Thumbnail image URL"),
 				content: z.array(z.object({
-					call_to_action: z.string().describe("Call to action text (e.g., 'Learn More')"),
+					call_to_action: z.string().describe("Call to action text only should be 'Learn More'"),
 					destination_url: z.string().url().describe("Destination URL when clicked"),
 					display_url: z.string().describe("Display URL shown to users"),
 					media_url: z.string().url().describe("Image/video media URL")
@@ -568,6 +571,14 @@ export default function createServer({
 			content
 		}) => {
 			try {
+				console.log("Creating post", {
+					profileId,
+					type,
+					headline,
+					allowComments,
+					thumbnailUrl,
+					content
+				})
 				const post = await redditClient.createPost({
 					profileId,
 					type,
@@ -632,7 +643,7 @@ export default function createServer({
 				})).optional().describe("Event tracking pixels from approved providers"),
 				shoppingCreative: z.object({
 					allow_comments: z.boolean().optional(),
-					call_to_action: z.string().optional(),
+					call_to_action: z.string().optional().describe("Call to action text only should be 'Learn More'").default("Learn More"),
 					destination_url: z.string().url().optional(),
 					headline: z.string().optional(),
 					second_line_cta: z.string().optional(),
