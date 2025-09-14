@@ -84,14 +84,13 @@ class RedditAdsAPIClient {
 	async createPost(data: any) {
 		console.log("Creating posttt", data)
 		const requestData = {
-			data: {
+			
 				profileId: data.profileId,
 				allow_comments: data.allowComments,
 				content: data.content,
 				headline: data.headline,
 				thumbnailUrl: data.thumbnailUrl,
 				type: data.type
-			}
 		}
 		const response = await this.axiosInstance.post('/api/reddit/ads/create-post', requestData)
 		console.log("Post created", response.data)
