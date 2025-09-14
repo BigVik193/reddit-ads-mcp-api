@@ -82,7 +82,16 @@ class RedditAdsAPIClient {
 	}
 
 	async createPost(data: any) {
-		const response = await this.axiosInstance.post('/api/reddit/ads/create-post', data)
+		const requestData = {
+			data: {
+				allow_comments: data.allowComments,
+				content: data.content,
+				headline: data.headline,
+				thumbnail_url: data.thumbnailUrl,
+				type: data.type
+			}
+		}
+		const response = await this.axiosInstance.post('/api/reddit/ads/create-post', requestData)
 		return response.data
 	}
 
@@ -540,29 +549,23 @@ export default function createServer({
 				profileId: z.string().describe("Reddit profile ID (format: t2_xxxxx)"),
 				type: z.enum(["CAROUSEL", "IMAGE", "TEXT", "VIDEO"]).describe("Post type"),
 				headline: z.string().describe("Post title/headline"),
-				allowComments: z.boolean().default(true).describe("Enable comments on the post"),
-				body: z.string().max(40000).optional().describe("Text content for text posts (max 40,000 characters)"),
-				thumbnailUrl: z.string().url().optional().describe("Thumbnail image URL (required for video posts)"),
+				allowComments: z.boolean().describe("Enable comments on the post"),
+				thumbnailUrl: z.string().url().describe("Thumbnail image URL"),
 				content: z.array(z.object({
-					call_to_action: z.string().optional().describe("Call to action text (e.g., 'Learn More')"),
-					destination_url: z.string().url().optional().describe("Destination URL when clicked"),
-					display_url: z.string().optional().describe("Display URL shown to users"),
-					media_url: z.string().url().optional().describe("Image/video media URL")
-				})).max(6).optional().describe("Post content array (max 6 items for carousel, 1 for others)"),
-				isRichtext: z.boolean().optional().describe("Whether text post body is in richtext format"),
-				imageDescription: z.string().optional().describe("Description for AI image generation")
+					call_to_action: z.string().describe("Call to action text (e.g., 'Learn More')"),
+					destination_url: z.string().url().describe("Destination URL when clicked"),
+					display_url: z.string().describe("Display URL shown to users"),
+					media_url: z.string().url().describe("Image/video media URL")
+				})).min(1).describe("Post content array (required)")
 			},
 		},
 		async ({ 
 			profileId, 
 			type, 
 			headline,
-			allowComments = true,
-			body,
+			allowComments,
 			thumbnailUrl,
-			content,
-			isRichtext,
-			imageDescription
+			content
 		}) => {
 			try {
 				const post = await redditClient.createPost({
@@ -570,11 +573,8 @@ export default function createServer({
 					type,
 					headline,
 					allowComments,
-					body,
 					thumbnailUrl,
-					content,
-					isRichtext,
-					imageDescription
+					content
 				})
 				return {
 					content: [
