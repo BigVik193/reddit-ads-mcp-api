@@ -85,11 +85,11 @@ class RedditAdsAPIClient {
 		console.log("Creating posttt", data)
 		const requestData = {
 			data: {
-				profile_id: data.profileId,
+				profileId: data.profileId,
 				allow_comments: data.allowComments,
 				content: data.content,
 				headline: data.headline,
-				thumbnail_url: data.thumbnailUrl,
+				thumbnailUrl: data.thumbnailUrl,
 				type: data.type
 			}
 		}
@@ -555,7 +555,7 @@ export default function createServer({
 				allowComments: z.boolean().describe("Enable comments on the post"),
 				thumbnailUrl: z.string().url().describe("Thumbnail image URL"),
 				content: z.array(z.object({
-					call_to_action: z.string().describe("Call to action text only should be 'Learn More'"),
+					call_to_action: z.string().describe("Call to action text only should be 'Learn More'").default("Learn More"),
 					destination_url: z.string().url().describe("Destination URL when clicked"),
 					display_url: z.string().describe("Display URL shown to users"),
 					media_url: z.string().url().describe("Image/video media URL")
