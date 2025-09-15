@@ -57,19 +57,7 @@ class RedditAdsAPIClient {
 		return response.data
 	}
 
-	async getPosts(profileId: string) {
-		const response = await this.axiosInstance.get('/api/reddit/ads/get-posts', {
-			params: { profileId },
-		})
-		return response.data
-	}
 
-	async getPost(postId: string) {
-		const response = await this.axiosInstance.get('/api/reddit/ads/get-post', {
-			params: { postId },
-		})
-		return response.data
-	}
 
 	async createCampaign(data: any) {
 		const response = await this.axiosInstance.post('/api/reddit/ads/create-campaign', data)
@@ -304,76 +292,7 @@ export default function createServer({
 		}
 	)
 
-	server.registerTool(
-		"getPosts",
-		{
-			title: "Get Posts",
-			description: "Get all posts for a specific Reddit profile",
-			inputSchema: {
-				profileId: z.string().describe("Reddit profile ID"),
-			},
-		},
-		async ({ profileId }) => {
-			try {
-				const posts = await redditClient.getPosts(profileId)
-				return {
-					content: [
-						{
-							type: "text",
-							text: JSON.stringify(posts, null, 2),
-						},
-					],
-				}
-			} catch (error) {
-				return {
-					content: [
-						{
-							type: "text",
-							text: `Error fetching posts: ${error}`,
-						},
-					],
-					isError: true,
-				}
-			}
-		}
-	)
 
-	server.registerTool(
-		"getPost",
-		{
-			title: "Get Post",
-			description: "Get details for a specific Reddit post",
-			inputSchema: {
-				postId: z.string().describe("Reddit post ID"),
-			},
-		},
-		async ({ postId }) => {
-			try {
-				const post = await redditClient.getPost(postId)
-				return {
-					content: [
-						{
-							type: "text",
-							text: post
-								? JSON.stringify(post, null, 2)
-								: `Post with ID ${postId} not found`,
-						},
-					],
-					isError: !post,
-				}
-			} catch (error) {
-				return {
-					content: [
-						{
-							type: "text",
-							text: `Error fetching post: ${error}`,
-						},
-					],
-					isError: true,
-				}
-			}
-		}
-	)
 
 	server.registerTool(
 		"createCampaign",
